@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetBasics - Student Budgeting Platform</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('bb-theme');
+          if (t !== 'dark' && t !== 'light') {
+            t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark' : 'light';
+          }
+          if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        } catch (e) {}
+      })();
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <a id="top"></a>
+
+    <header class="topNavBar">
+        <div class="brandBlock">
+            <div class="siteLogo">BudgetBasics</div>
+        </div>
+        <div class="navControls">
+            <nav>
+                <ul class="navigationMenu">
+                    <li><a href="javascript:void(0)" class="menuItem active" data-section="home">Home</a></li>
+                    <li><a href="javascript:void(0)" class="menuItem" data-section="learn">Learn</a></li>
+                    <li><a href="javascript:void(0)" class="menuItem" data-section="tools">Tools</a></li>
+                    <li><a href="javascript:void(0)" class="menuItem" data-section="resources">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="themeToggleBtn" id="themeToggle">Dark Mode</button>
+        </div>
+    </header>
+
+    <section id="home" class="wholePage visiblePage">
+        <div class="sliderWrapper">
+            <div class="bigSlider">
+                <div class="slideImage active"
+                    style="background-image: url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1600&q=80')"
+                    data-slide="0">
+                    <div class="slideTextArea">
+                        <h1>Master Your Student Allowance</h1>
+                        <p>Practical budgeting calculators, actionable money habits, and transparent tracking built for
+                            university students.</p>
+                        <button class="slideButton" onclick="switchSection('learn')">Start Learning</button>
+                    </div>
+                </div>
+                <div class="slideImage"
+                    style="background-image: url('https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=1600&q=80')"
+                    data-slide="1">
+                    <div class="slideTextArea">
+                        <h1>Needs Versus Wants Challenge</h1>
+                        <p>Learn how to separate campus essentials from impulse buys before pocket money runs out.</p>
+                        <button class="slideButton" onclick="switchSection('learn', 'needswants')">Take
+                            Challenge</button>
+                    </div>
+                </div>
+                <div class="slideImage"
+                    style="background-image: url('https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1600&q=80')"
+                    data-slide="2">
+                    <div class="slideTextArea">
+                        <h1>Plan for Your Milestone Goals</h1>
+                        <p>Saving for a laptop or semester project? Forecast monthly targets and monitor your timeline
+                            accurately.</p>
+                        <button class="slideButton" onclick="switchSection('tools', 'savings')">Open
+                            Calculators</button>
+                    </div>
+                </div>
+
+                <button class="slideArrowButton previousArrow">&lt;</button>
+                <button class="slideArrowButton nextArrow">&gt;</button>
+                <div class="dotContainer">
+                    <span class="smallDot active" data-slide="0"></span>
+                    <span class="smallDot" data-slide="1"></span>
+                    <span class="smallDot" data-slide="2"></span>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <div class="welcomeText">
+                <h2>Smart Financial Discipline for Students</h2>
+                <p class="subTitle">Straightforward financial tools, real campus expense models, and practical
+                    calculations in PKR.</p>
+            </div>
+
+            <div class="statsSection">
+                <div class="cardBox statBox">
+                    <h4>Active Learners Today</h4>
+                    <div class="largeNumber"><span id="visitorCount">--</span></div>
+                </div>
+                <div class="cardBox statBox">
+                    <h4>Date and Real-time Clock</h4>
+                    <div class="largeNumber" id="clockText">--:--:--</div>
+                    <div id="dateText" class="text-muted" style="font-size: 0.85rem; margin-top: 4px;"></div>
+                </div>
+            </div>
+
+            <div class="cardBox">
+                <h3>Why Budgeting Matters in College</h3>
+                <p>Between hostel accommodation, course readings, transit fares, and canteen food, pocket money
+                    disappears rapidly when you do not keep tabs. Tracking does not mean depriving yourself of social
+                    outings. It gives you the freedom to spend confidently because you know your core semester
+                    obligations are already paid.</p>
+            </div>
+
+            <div class="cardBox">
+                <h3>Typical PKR 45,000 Student Monthly Allocation</h3>
+                <p>Here is a breakdown representing a realistic distribution for an urban university student managing
+                    accommodation, commuting, and savings.</p>
+                <div class="chartContainer">
+                    <canvas id="homeBudgetChart"></canvas>
+                </div>
+            </div>
+
+            <div class="cardBox">
+                <h3>Three Pillars of Student Financial Health</h3>
+                <div class="tipsContainer">
+                    <div class="tipBox"><strong>Save on Day One:</strong> Transfer 15% to 20% of your allowance into a
+                        reserve wallet the moment you get paid. What you do not see, you will not spend.</div>
+                    <div class="tipBox"><strong>Track Daily Micro-Spends:</strong> Chai, snacks, photocopies, and
+                        ride-shares silently compound. Logging them weekly catches leaks early.</div>
+                    <div class="tipBox"><strong>Enforce the 24-Hour Rule:</strong> For any unplanned purchase above PKR
+                        1,000, wait a full day. Most impulse desires fade by morning.</div>
+                </div>
+            </div>
+
+            <div class="cardBox quickChecklistBanner">
+                <div>
+                    <h4 style="margin:0 0 4px 0;">Need a printable monthly checklist?</h4>
+                    <p class="text-muted" style="margin:0; font-size:0.9rem;">Download or print our student budget
+                        checklist to stick on your study desk.</p>
+                </div>
+                <button class="commonButton button1" onclick="switchSection('tools', 'checklist')">View
+                    Checklist</button>
+            </div>
+
+            <div class="cardBox">
+                <span class="sitemapLink">View Website Structure Sitemap</span>
+                <div class="sitemapContent" id="sitemapBox">
+                    <ul>
+                        <li><strong>Home:</strong> Overview, hero banner, live clock, visitor telemetry, and core rules.
+                        </li>
+                        <li><strong>Learn:</strong> Fixed vs variable costs, interactive knowledge check, Needs vs Wants
+                            flowchart and game, 50-30-20 calculator, and common money traps.</li>
+                        <li><strong>Tools:</strong> Savings goal estimator with dynamic tips, interactive expense
+                            planner with Edit and Delete, keyword tip search, and printable checklist.</li>
+                        <li><strong>Resources:</strong> Topic-filtered infographic cards, project background and student
+                            team credits, feedback form, and contact us form.</li>
+                        <li><strong>AI Assistant:</strong> Floating BudgetAssistant widget available across all pages.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <section id="learn" class="wholePage">
+        <main>
+            <h2 style="margin-top:24px;">Student Learning Center</h2>
+            <p style="margin-bottom: 24px;">Work through each module to build practical financial instincts for
+                university and beyond.</p>
+
+            <div class="tabRow">
+                <button class="tabButton active" data-sub="basics">Budgeting Basics</button>
+                <button class="tabButton" data-sub="needswants">Needs vs Wants</button>
+                <button class="tabButton" data-sub="rule">50-30-20 Rule</button>
+                <button class="tabButton" data-sub="mistakes">Common Mistakes</button>
+            </div>
+
+            <div class="tabPanel active cardBox" id="basics">
+                <h3>Core Budgeting Framework</h3>
+                <p>A functional student budget divides your allowance into <strong>fixed expenses</strong> (unavoidable
+                    obligations like shared hostel rent and bus passes), <strong>variable expenses</strong> (groceries,
+                    canteen food, stationery), and <strong>savings</strong>.</p>
+
+                <h4>Sample Monthly Student Allocation (PKR)</h4>
+                <table class="infoTable">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Classification</th>
+                            <th>Monthly Amount (PKR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Monthly Allowance / Stipend</td>
+                            <td>Income / Inflow</td>
+                            <td>PKR 45,000</td>
+                        </tr>
+                        <tr>
+                            <td>Hostel / Room Share</td>
+                            <td>Fixed Expense</td>
+                            <td>PKR 18,000</td>
+                        </tr>
+                        <tr>
+                            <td>Utilities and Wi-Fi Access</td>
+                            <td>Fixed Expense</td>
+                            <td>PKR 4,000</td>
+                        </tr>
+                        <tr>
+                            <td>Groceries and Campus Meals</td>
+                            <td>Variable Expense</td>
+                            <td>PKR 10,000</td>
+                        </tr>
+                        <tr>
+                            <td>Public Transit / Fuel</td>
+                            <td>Variable Expense</td>
+                            <td>PKR 5,000</td>
+                        </tr>
+                        <tr>
+                            <td>Emergency Buffer and Savings</td>
+                            <td>Savings and Buffer</td>
+                            <td>PKR 8,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin-top: 24px;">Expense Allocation Chart</h4>
+                <div class="chartContainer">
+                    <canvas id="basicsChart"></canvas>
+                </div>
+
+                <div class="knowledgeCheckCard">
+                    <h4>Knowledge Check: Test Your Instincts</h4>
+                    <p>You pay PKR 3,500 every semester for university library internet access. What category does this
+                        expense belong to?</p>
+                    <div class="quizOptions">
+                        <button class="commonButton quizBtn" data-correct="false">Variable Expense</button>
+                        <button class="commonButton quizBtn" data-correct="true">Fixed Academic Expense</button>
+                        <button class="commonButton quizBtn" data-correct="false">Discretionary Want</button>
+                    </div>
+                    <div class="quizFeedback" style="display:none; margin-top:10px; font-weight:500;"></div>
+                </div>
+
+                <h4 style="margin-top: 24px;">5 Steps to Build Your First Campus Budget</h4>
+                <p><strong>1. Calculate Real Inflow:</strong> Tally allowance, internship pay, and freelance gigs. This
+                    total is your ceiling.</p>
+                <p><strong>2. Clear Fixed Costs First:</strong> Pay hostel fees and mobile packages immediately so you
+                    never risk late penalties.</p>
+                <p><strong>3. Save Instantly:</strong> Move 15% to 20% straight to a separate digital account on day
+                    one.</p>
+                <p><strong>4. Cap Weekly Spending:</strong> Divide your remaining variable funds across four weeks to
+                    avoid early-month depletion.</p>
+                <p><strong>5. Review Every Sunday:</strong> Take 5 minutes each weekend to audit your balance and adjust
+                    for the week ahead.</p>
+            </div>
+
+            <div class="tabPanel cardBox" id="needswants">
+                <h3>Needs Versus Wants</h3>
+                <p>A <strong>Need</strong> is essential for your health, housing, or academic coursework. A
+                    <strong>Want</strong> adds comfort or entertainment, but can be postponed or replaced without severe
+                    consequences.</p>
+
+                <div class="flowchartContainer">
+                    <h4>Visual Spending Decision Guide</h4>
+                    <p class="text-muted" style="font-size:0.85rem; margin-bottom:16px;">Use this 3-step decision tree
+                        before making any non-essential purchase:</p>
+                    <div class="decisionTree">
+                        <div class="treeNode">
+                            <span class="treeStep">Step 1</span>
+                            <strong>Is it required for health or courses?</strong>
+                            <div class="treeBranch">
+                                <span class="branchYes">YES: It is a NEED (Prioritize)</span>
+                                <span class="branchNo">NO: Proceed to Step 2</span>
+                            </div>
+                        </div>
+                        <div class="treeConnector">|</div>
+                        <div class="treeNode">
+                            <span class="treeStep">Step 2</span>
+                            <strong>Can your studies wait 48 hours without it?</strong>
+                            <div class="treeBranch">
+                                <span class="branchYes">YES: CAN WAIT (Delay purchase)</span>
+                                <span class="branchNo">NO: Emergency essential</span>
+                            </div>
+                        </div>
+                        <div class="treeConnector">|</div>
+                        <div class="treeNode">
+                            <span class="treeStep">Step 3</span>
+                            <strong>Is there a free campus or cheaper alternative?</strong>
+                            <div class="treeBranch">
+                                <span class="branchYes">YES: Use campus library or canteen</span>
+                                <span class="branchNo">NO: Budget as planned want</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 24px;">Classification Challenge</h4>
+                <p class="text-muted" style="font-size:0.9rem;">Classify these everyday student expenses honestly:</p>
+                <div id="nwGame"></div>
+            </div>
+
+            <div class="tabPanel cardBox" id="rule">
+                <h3>The 50-30-20 Budgeting Rule</h3>
+                <p>A proven allocation rule of thumb: assign <strong>50%</strong> for living necessities,
+                    <strong>30%</strong> for discretionary personal wants, and <strong>20%</strong> for emergency
+                    savings.</p>
+
+                <div class="calculatorBox">
+                    <label for="incomeInput">Monthly Income / Allowance (PKR)</label>
+                    <input type="number" id="incomeInput" placeholder="45000" value="45000">
+                    <button class="commonButton button1" id="calcRuleBtn">Calculate Breakdown</button>
+                </div>
+
+                <div class="calculatorResult" id="ruleResults"></div>
+
+                <h4 style="margin-top: 24px;">Suggested Distribution</h4>
+                <div class="chartContainer">
+                    <canvas id="ruleChart"></canvas>
+                </div>
+                <p class="educationalNote"><em>Educational Disclaimer: This breakdown is an educational estimate and
+                        guideline. Students in high-rent hostels may adjust the split to 60-25-15 as needed.</em></p>
+            </div>
+
+            <div class="tabPanel" id="mistakes">
+                <div class="cardBox">
+                    <h3>Common Student Money Traps</h3>
+                    <p>Most campus financial stress stems from five predictable habits. Click to expand each trap, its
+                        real impact, and how to avoid it.</p>
+                </div>
+
+                <div class="faqSection">
+                    <div class="faqItem">
+                        <div class="faqHeader"><span>1. Impulse Spending on Campus Non-Essentials</span><span
+                                class="faqSign">+</span></div>
+                        <div class="faqBody">
+                            <p><strong>Scenario:</strong> Buying branded clothes or trendy gadgets during exam stress
+                                depletes your fixed grocery budget.</p>
+                            <p><strong>Corrective Action:</strong> Enforce a strict 24-hour waiting rule for any
+                                non-essential purchase above PKR 1,000.</p>
+                        </div>
+                    </div>
+                    <div class="faqItem">
+                        <div class="faqHeader"><span>2. Unmonitored Auto-Renewing Subscriptions</span><span
+                                class="faqSign">+</span></div>
+                        <div class="faqBody">
+                            <p><strong>Scenario:</strong> Forgotten video streaming, music subscriptions, and cloud
+                                storage silently bill your debit card PKR 3,000+ monthly.</p>
+                            <p><strong>Corrective Action:</strong> Audit recurring charges on the 1st of every month and
+                                cancel any service not opened within 14 days.</p>
+                        </div>
+                    </div>
+                    <div class="faqItem">
+                        <div class="faqHeader"><span>3. Operating Without an Emergency Buffer</span><span
+                                class="faqSign">+</span></div>
+                        <div class="faqBody">
+                            <p><strong>Scenario:</strong> A sudden medical prescription, lost ID card replacement, or
+                                cracked screen creates immediate panic.</p>
+                            <p><strong>Corrective Action:</strong> Build and keep an untouched PKR 5,000 cash buffer in
+                                a dedicated secondary digital wallet.</p>
+                        </div>
+                    </div>
+                    <div class="faqItem">
+                        <div class="faqHeader"><span>4. Late Payments and Due Date Overdue Fees</span><span
+                                class="faqSign">+</span></div>
+                        <div class="faqBody">
+                            <p><strong>Scenario:</strong> Forgetting utility or semester fee deadlines incurs avoidable
+                                late surcharge fines.</p>
+                            <p><strong>Corrective Action:</strong> Add calendar reminders 3 days before due dates and
+                                pay fixed bills immediately upon receiving allowance.</p>
+                        </div>
+                    </div>
+                    <div class="faqItem">
+                        <div class="faqHeader"><span>5. Spending Without a Pre-Allocated Plan</span><span
+                                class="faqSign">+</span></div>
+                        <div class="faqBody">
+                            <p><strong>Scenario:</strong> Spending casually without tracking until you run out of cash
+                                by the 18th of the month.</p>
+                            <p><strong>Corrective Action:</strong> Divide your variable money across 4 weekly envelopes
+                                or digital sub-accounts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <section id="tools" class="wholePage">
+        <main>
+            <h2 style="margin-top:24px;">Interactive Financial Tools</h2>
+            <p style="margin-bottom: 24px;">Plan savings, track daily transactions, search student tips, and print your
+                monthly checklist.</p>
+
+            <div class="tabRow">
+                <button class="tabButton active" data-sub="savings">Savings Goal Calculator</button>
+                <button class="tabButton" data-sub="planner">Expense Planner</button>
+                <button class="tabButton" data-sub="searchfilter">Tip Search &amp; Filter</button>
+                <button class="tabButton" data-sub="checklist">Student Checklist</button>
+            </div>
+
+            <div class="tabPanel active cardBox" id="savings">
+                <h3>Savings Goal Calculator</h3>
+                <p>Enter your target purchase (e.g. laptop upgrade, internship relocation, or exam fee) to estimate your
+                    savings timeline.</p>
+
+                <div class="calculatorBox">
+                    <label for="goalName">Goal Description</label>
+                    <input type="text" id="goalName" placeholder="e.g. Laptop Upgrade">
+
+                    <label for="goalTarget">Target Amount (PKR)</label>
+                    <input type="number" id="goalTarget" placeholder="85000">
+
+                    <label for="goalCurrent">Current Amount Saved (PKR)</label>
+                    <input type="number" id="goalCurrent" placeholder="15000">
+
+                    <label for="goalMonthly">Planned Monthly Contribution (PKR)</label>
+                    <input type="number" id="goalMonthly" placeholder="10000">
+
+                    <button class="commonButton button1" id="calcGoalBtn">Calculate Progress</button>
+                </div>
+
+                <div class="calculatorResult" id="goalResults"></div>
+
+                <h4 style="margin-top: 24px;">12-Month Projected Growth</h4>
+                <div class="chartContainer">
+                    <canvas id="savingsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="tabPanel cardBox" id="planner">
+                <h3>Session Expense Planner</h3>
+                <p>Log your daily purchases to keep tabs on your remaining balance in real time.</p>
+
+                <div class="calculatorBox" style="max-width: 320px;">
+                    <label for="monthlyBudgetInput">Total Monthly Budget (PKR)</label>
+                    <input type="number" id="monthlyBudgetInput" value="45000">
+                </div>
+
+                <div class="expenseFormGrid">
+                    <div>
+                        <label for="expDate">Date</label>
+                        <input type="date" id="expDate">
+                    </div>
+                    <div>
+                        <label for="expCategory">Category</label>
+                        <select id="expCategory">
+                            <option>Food</option>
+                            <option>Transport</option>
+                            <option>Education</option>
+                            <option>Entertainment</option>
+                            <option>Shopping</option>
+                            <option>Utilities</option>
+                            <option>Miscellaneous</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="expDesc">Description</label>
+                        <input type="text" id="expDesc" placeholder="e.g. Lab Manual">
+                    </div>
+                    <div>
+                        <label for="expAmount">Amount (PKR)</label>
+                        <input type="number" id="expAmount" placeholder="1500">
+                    </div>
+                </div>
+
+                <div style="margin-top: 14px; display: flex; gap: 8px;">
+                    <button class="commonButton button1" id="addExpenseBtn">Add Expense Entry</button>
+                    <button class="commonButton button2" id="cancelEditBtn" style="display:none;">Cancel Edit</button>
+                </div>
+
+                <table class="infoTable" style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount (PKR)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody"></tbody>
+                </table>
+
+                <div style="margin-top: 18px; font-size: 1rem;">
+                    <p>Total Recorded Expenses: <strong id="totalExpensesText">PKR 0.00</strong></p>
+                    <p>Remaining Available Balance: <strong id="remainingBalanceText" class="text-primary">PKR
+                            45,000.00</strong></p>
+                </div>
+            </div>
+
+            <div class="tabPanel cardBox" id="searchfilter">
+                <h3>Financial Tips Search, Sort &amp; Filter</h3>
+                <p class="text-muted" style="margin-bottom: 16px;">Filter tips by category pills, search keywords, or
+                    sort alphabetically.</p>
+
+                <div class="searchControlsRow">
+                    <input type="text" class="searchInput" id="tipSearchInput"
+                        placeholder="Search keywords (e.g. save, food, buffer)...">
+
+                    <div class="sortSelectWrapper">
+                        <label for="tipSortSelect" style="display:inline; margin-right:6px;">Sort:</label>
+                        <select id="tipSortSelect" style="width:auto; display:inline-block;">
+                            <option value="relevant">Most Relevant</option>
+                            <option value="az">A - Z</option>
+                            <option value="newest">Newest</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pillFilterGroup" id="tipCategoryPills">
+                    <button class="pillBtn active" data-category="all">All Topics</button>
+                    <button class="pillBtn" data-category="saving">Saving</button>
+                    <button class="pillBtn" data-category="needs">Needs</button>
+                    <button class="pillBtn" data-category="expenses">Expenses</button>
+                    <button class="pillBtn" data-category="goals">Goals</button>
+                    <button class="pillBtn" data-category="budgeting">Budgeting</button>
+                </div>
+
+                <div class="tipsContainer" id="filterTipsGrid"></div>
+                <p class="noResultsMessage" id="filterEmptyMsg">No matching tips found. Try a different search term or
+                    category.</p>
+            </div>
+
+            <div class="tabPanel cardBox" id="checklist">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+                    <div>
+                        <h3 style="margin:0;">Student Monthly Budget Checklist</h3>
+                        <p class="text-muted" style="margin:4px 0 0 0; font-size:0.9rem;">Essential checkpoints to
+                            complete each academic month.</p>
+                    </div>
+                    <button class="commonButton button1" onclick="window.print()">Print Checklist</button>
+                </div>
+
+                <div class="checklistContainer">
+                    <label class="checkItem"><input type="checkbox"> 1. Tally incoming allowance, stipends, and
+                        freelance money on day 1.</label>
+                    <label class="checkItem"><input type="checkbox"> 2. Transfer 15% to 20% immediately into a separate
+                        savings account.</label>
+                    <label class="checkItem"><input type="checkbox"> 3. Pay hostel share, semester dues, and
+                        utility/Wi-Fi bills.</label>
+                    <label class="checkItem"><input type="checkbox"> 4. Audit active mobile data and digital
+                        subscriptions.</label>
+                    <label class="checkItem"><input type="checkbox"> 5. Divide remaining cash across 4 weekly spending
+                        limits.</label>
+                    <label class="checkItem"><input type="checkbox"> 6. Conduct a 5-minute Sunday balance audit every
+                        weekend.</label>
+                    <label class="checkItem"><input type="checkbox"> 7. Log any unexpected expenses in the session
+                        planner.</label>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <section id="resources" class="wholePage">
+        <main>
+            <h2 style="margin-top:24px;">Resources, Support &amp; Team</h2>
+            <p style="margin-bottom: 24px;">Visual summaries, project information, feedback form, and direct contact
+                support.</p>
+
+            <div class="tabRow">
+                <button class="tabButton active" data-sub="infographics">Infographics</button>
+                <button class="tabButton" data-sub="about">About &amp; Team</button>
+                <button class="tabButton" data-sub="feedback">Feedback Form</button>
+                <button class="tabButton" data-sub="contact">Contact Us</button>
+            </div>
+
+            <div class="tabPanel active cardBox" id="infographics">
+                <h3>Visual Infographics Gallery</h3>
+                <p class="text-muted" style="margin-bottom: 16px;">Click any card to review its visual breakdown.</p>
+
+                <div class="pillFilterGroup" id="infoPills">
+                    <button class="pillBtn active" data-topic="all">All Topics</button>
+                    <button class="pillBtn" data-topic="budgeting">Budgeting</button>
+                    <button class="pillBtn" data-topic="savings">Savings</button>
+                    <button class="pillBtn" data-topic="habits">Habits</button>
+                </div>
+
+                <div class="infoCardGrid" id="infoGrid"></div>
+            </div>
+
+            <div class="tabPanel cardBox" id="about">
+                <h3>About BudgetBasics</h3>
+                <p>BudgetBasics is an educational web platform built for college students in Pakistan. It simplifies
+                    personal budgeting fundamentals through transparent tracking, realistic calculations, and zero
+                    server-side storage requirements.</p>
+
+                <h4>Project Details</h4>
+                <p><strong>Theme:</strong> NextGen BudgetBee | <strong>Competition:</strong> TechWiz 7 (Web Innovation
+                    Unleashed)</p>
+                <p><strong>Technology Stack:</strong> Semantic HTML5, CSS3, JavaScript, jQuery 3.7.1, Chart.js 4.4.1.
+                    Fully client-side with zero tracking.</p>
+
+                <h4>Project Creators and Team Credits</h4>
+                <div class="teamGrid">
+                    <div class="teamMemberCard">
+                        <strong>Abdul Rauf</strong>
+                        <span class="text-muted" style="font-size:0.85rem; display:block;">Team Lead &amp; Logic
+                            Engineer</span>
+                        <p style="font-size:0.85rem; margin-top:6px;">Architected the application logic, calculator
+                            formulas, chart integrations, and overall system flow.</p>
+                    </div>
+                    <div class="teamMemberCard">
+                        <strong>Syed Ata Ul Hai</strong>
+                        <span class="text-muted" style="font-size:0.85rem; display:block;">UI &amp; UX Designer</span>
+                        <p style="font-size:0.85rem; margin-top:6px;">Designed the visual layout, color system, theme
+                            experience, and overall usability.</p>
+                    </div>
+                    <div class="teamMemberCard">
+                        <strong>Hasnain Wajahat</strong>
+                        <span class="text-muted" style="font-size:0.85rem; display:block;">HTML &amp; CSS
+                            Engineer</span>
+                        <p style="font-size:0.85rem; margin-top:6px;">Built the semantic markup, responsive styling, and
+                            the dark/light theme system.</p>
+                    </div>
+                    <div class="teamMemberCard">
+                        <strong>Abdul Rehman</strong>
+                        <span class="text-muted" style="font-size:0.85rem; display:block;">Technical Writer &amp;
+                            QA</span>
+                        <p style="font-size:0.85rem; margin-top:6px;">Authored documentation, validated SRS
+                            requirements, and performed cross-browser testing.</p>
+                    </div>
+                </div>
+                <p class="text-muted" style="font-size:0.85rem; margin-top:16px;">Developed under the mentorship of
+                    Aptech Computer Education.</p>
+            </div>
+
+            <div class="tabPanel cardBox" id="feedback">
+                <h3>Platform Feedback Form</h3>
+                <p class="text-muted" style="margin-bottom: 16px;">Help us improve BudgetBasics for fellow students.
+                </p>
+
+                <form class="feedbackForm" id="feedbackForm">
+                    <label for="fbName">Your Full Name</label>
+                    <input type="text" id="fbName" placeholder="e.g. Saad Khan">
+                    <span class="errorMessage" id="errName">Please enter your name.</span>
+
+                    <label for="fbEmail" style="margin-top:12px; display:block;">Email Address</label>
+                    <input type="email" id="fbEmail" placeholder="e.g. saad@student.pk">
+                    <span class="errorMessage" id="errEmail">Please enter a valid email address.</span>
+
+                    <label style="margin-top:12px; display:block;">Overall Experience Rating</label>
+                    <div class="ratingGroup" id="starRow">
+                        <label class="ratingOption"><input type="radio" name="fbRating" value="1"> 1 (Poor)</label>
+                        <label class="ratingOption"><input type="radio" name="fbRating" value="2"> 2 (Fair)</label>
+                        <label class="ratingOption"><input type="radio" name="fbRating" value="3"> 3 (Good)</label>
+                        <label class="ratingOption"><input type="radio" name="fbRating" value="4"> 4 (Very Good)</label>
+                        <label class="ratingOption"><input type="radio" name="fbRating" value="5"> 5 (Excellent)</label>
+                    </div>
+                    <span class="errorMessage" id="errRating">Please choose a rating.</span>
+
+                    <label for="fbComments" style="margin-top:12px; display:block;">Comments and Suggestions</label>
+                    <textarea id="fbComments" rows="4"
+                        placeholder="What features would help your campus budget?"></textarea>
+                    <span class="errorMessage" id="errComments">Please add your comments.</span>
+
+                    <button type="submit" class="commonButton button1" style="margin-top:16px;">Submit Feedback</button>
+                </form>
+                <div class="successMessage" id="fbSuccess">Thank you! Your feedback has been validated and recorded for
+                    this session.</div>
+            </div>
+
+            <div class="tabPanel cardBox" id="contact">
+                <h3>Contact Student Support</h3>
+                <p class="text-muted" style="margin-bottom: 16px;">Reach out with inquiries, bug reports, or project
+                    questions.</p>
+
+                <div class="contactLayoutGrid">
+                    <form id="contactForm" style="flex:1;">
+                        <label for="ctName">Your Name</label>
+                        <input type="text" id="ctName" placeholder="e.g. Ayesha Malik">
+                        <span class="errorMessage" id="errCtName">Please enter your name.</span>
+
+                        <label for="ctEmail" style="margin-top:12px; display:block;">Email Address</label>
+                        <input type="email" id="ctEmail" placeholder="e.g. ayesha@univ.edu.pk">
+                        <span class="errorMessage" id="errCtEmail">Please enter a valid email address.</span>
+
+                        <label for="ctSubject" style="margin-top:12px; display:block;">Subject</label>
+                        <input type="text" id="ctSubject" placeholder="e.g. Question about 50-30-20 calculator">
+                        <span class="errorMessage" id="errCtSubject">Please enter a subject.</span>
+
+                        <label for="ctMessage" style="margin-top:12px; display:block;">Message</label>
+                        <textarea id="ctMessage" rows="4" placeholder="How can we assist you?"></textarea>
+                        <span class="errorMessage" id="errCtMessage">Please write your message.</span>
+
+                        <button type="submit" class="commonButton button1" style="margin-top:16px;">Send
+                            Message</button>
+                        <div class="successMessage" id="ctSuccess">Your message has been validated and queued for
+                            review. Thank you!</div>
+                    </form>
+
+                    <div class="contactInfoCard">
+                        <h4>Project Helpdesk</h4>
+                        <p><strong>Email:</strong> support@budgetbasics.pk</p>
+                        <p><strong>Helpdesk Phone:</strong> +92 21 3456 7890</p>
+                        <p><strong>Location:</strong> Aptech Computer Education, Student Lab Campus</p>
+                        <p><strong>Hours:</strong> Mon - Sat: 9:00 AM - 6:00 PM</p>
+                        <div class="socialTextRow" style="margin-top:16px;">
+                            <a href="javascript:void(0)" class="socialLink">Facebook</a>
+                            <a href="javascript:void(0)" class="socialLink">Twitter</a>
+                            <a href="javascript:void(0)" class="socialLink">Instagram</a>
+                            <a href="javascript:void(0)" class="socialLink">LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <div class="popupBackground" id="modalOverlay">
+        <div class="popupBox">
+            <button class="popupCloseButton" id="modalCloseBtn">X</button>
+            <h3 id="modalTitle" style="margin-bottom: 12px;"></h3>
+            <p id="modalBody" style="line-height: 1.6;"></p>
+        </div>
+    </div>
+
+    <div class="popupBackground" id="privacyModal">
+        <div class="popupBox">
+            <button class="popupCloseButton" id="privacyCloseBtn">X</button>
+            <h3>Privacy Note</h3>
+            <p style="font-size:0.9rem; line-height:1.6;">BudgetBasics is an educational,
+                non-commercial client-side application. We do not store, harvest, or transmit your personal financial
+                numbers, bank accounts, or identity records to any external database or cloud server. All session data
+                lives strictly in your local browser memory and disappears when you refresh or close the tab.</p>
+        </div>
+    </div>
+
+    <div class="popupBackground" id="disclaimerModal">
+        <div class="popupBox">
+            <button class="popupCloseButton" id="disclaimerCloseBtn">X</button>
+            <h3>Educational Disclaimer</h3>
+            <p style="font-size:0.9rem; line-height:1.6;">The calculations, formulas, tips, and AI
+                assistant answers provided across BudgetBasics are intended solely for academic awareness and personal
+                budgeting practice. BudgetBasics is not a registered financial advisor or banking institution. Please
+                consult qualified financial counselors for formal investment or debt planning.</p>
+        </div>
+    </div>
+
+    <div class="aiHelperWidget" id="aiWidget">
+        <div class="aiHelperPanel" id="aiPanel">
+            <div class="aiHelperHeader">
+                <div class="aiHelperTitle">
+                    <span class="onlineDot"></span>
+                    BudgetAssistant (AI Helper)
+                </div>
+                <button class="aiHelperCloseButton" id="aiPanelClose">X</button>
+            </div>
+
+            <div class="aiDisclaimerBar">
+                <span>Notice: Educational assistant only. Not certified financial advice.</span>
+            </div>
+
+            <div class="chatMessages" id="chatWindow">
+                <div class="chatBubble botBubble">Hi! I am BudgetAssistant. Ask me about the 50-30-20 rule, emergency
+                    buffers, or cutting campus food costs!</div>
+            </div>
+
+            <div class="quickQuestions" id="quickQuestions">
+                <button class="quickQuestionButton" data-question="What is a need?">What is a need?</button>
+                <button class="quickQuestionButton" data-question="How much should I save?">How much to save?</button>
+                <button class="quickQuestionButton" data-question="How do I avoid overspending?">Avoid
+                    overspending?</button>
+                <button class="quickQuestionButton" data-question="What is the 50-30-20 rule?">50-30-20 rule?</button>
+            </div>
+
+            <div class="chatInputArea">
+                <input type="text" id="chatInput" placeholder="Ask a financial question...">
+                <button class="commonButton button1" id="chatAskBtn">Send</button>
+            </div>
+        </div>
+
+        <button class="aiHelpButton" id="aiToggleBtn">Chat</button>
+    </div>
+
+    <footer>
+        <div class="footerContent">
+            <div class="footerColumn">
+                <h4 class="footerHeading">BudgetBasics</h4>
+                <p class="footerAbout">An educational financial awareness platform designed for university students in
+                    Pakistan. Built for TechWiz 7.</p>
+            </div>
+            <div class="footerColumn">
+                <h4 class="footerHeading">Quick Navigation</h4>
+                <ul class="footerLinkList">
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="home">Home</a></li>
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="learn">Learn Budgeting</a></li>
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="tools">Interactive Tools</a></li>
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="resources">Resources &amp;
+                            Support</a></li>
+                </ul>
+            </div>
+            <div class="footerColumn">
+                <h4 class="footerHeading">Key Modules</h4>
+                <ul class="footerLinkList">
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="learn" data-sub="needswants">Needs
+                            vs. Wants</a></li>
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="learn" data-sub="rule">50-30-20
+                            Breakdown</a></li>
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="tools" data-sub="savings">Savings
+                            Estimator</a></li>
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="tools" data-sub="planner">Expense
+                            Tracker</a></li>
+                </ul>
+            </div>
+            <div class="footerColumn">
+                <h4 class="footerHeading">Support &amp; Legal</h4>
+                <ul class="footerLinkList">
+                    <li><a href="javascript:void(0)" id="openPrivacyLink">Privacy Note</a></li>
+                    <li><a href="javascript:void(0)" id="openDisclaimerLink">Educational Disclaimer</a></li>
+                    <li><a href="javascript:void(0)" class="footerLink" data-section="resources"
+                            data-sub="contact">Contact Helpdesk</a></li>
+                </ul>
+                <p class="footerContact" style="margin-top:8px;">Tel: +92 21 3456 7890<br>support@budgetbasics.pk</p>
+            </div>
+        </div>
+
+        <div class="footerBottom">
+            <a href="#top">Back to Top</a>
+            <p>&copy; <span id="yearText"></span> BudgetBasics - TechWiz 7 Project. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
